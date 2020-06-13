@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     
     <title>Mongo File Uploads</title>
+    <style>
+        img {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -19,7 +24,26 @@
                     </div>
                     <br>    
                     <input type="submit" value="submit" class="btn btn-primary btn-block">
-                </form>
+                </form><br>
+                <hr>
+                <%  if(files) { %>
+                    <%  files.forEach(function(file){ %>
+                        <div class="card card-body mb-3">
+                            <% if(file.isImage){ %>
+                                <img src="image/<%= file.filename %>" alt="">
+                                <% } else { %>
+                                    <%= file.filename %>
+                                    <% } %>
+                                <form method="POST" action="/files/<%= file._id %>?_method = DELETE">
+                                    <button class="btn btn-danger btn-block mt-4">Delete</button>
+                                </form>
+                            </div>
+                    
+                        <% }) %>
+
+                <% } else { %>
+                    <p>No files to show</p>
+                    <% } %>
             </div>
         </div>
     </div>

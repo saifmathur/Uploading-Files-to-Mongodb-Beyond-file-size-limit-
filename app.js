@@ -19,8 +19,11 @@ app.set('view engine','ejs')
 
 
 const conn = mongoose.createConnection('mongodb://localhost:27017/mongouploads',
-{ useNewUrlParser: true ,
- useUnifiedTopology: true })
+{ 
+    useNewUrlParser: true ,
+    useUnifiedTopology: true 
+}
+)
 
 let gfs;
 conn.once('open', function(){
@@ -54,7 +57,28 @@ const upload = multer({storage})
 
 // @route GET, loads form
 app.get('/', function (req,res){
-    res.render('index')
+    //res.render('index')
+    gfs.files.find().toArray(function (err, files){
+        if (!files || files.length === 0){
+           res.render('index', {files: false})
+            
+        }
+        //files exist
+        else{
+            files.map(function(file){
+                if(file.contentType === 'image/png' || file.contentType === 'image/jpeg'){
+                    file.isImage = true
+                }
+                else{
+                    file.isImage = false
+                }
+            })
+            res.render('index', {files: files})
+        }
+
+
+    })
+
 })
 
 //@route posts /uploading file to db
@@ -118,7 +142,14 @@ app.get('/image/:filename', function(req,res){
     })
 })
 
-
+app.delete('files/:id', function(req,res){
+    gfs.remove({id: req.params.id, root: 'uploads'}, function(err, gridFSBucket){
+        if(err){
+            return res.status(404).json({err: err})
+        }
+        res.redirect('/')
+    })
+})
 
 
 
